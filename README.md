@@ -24,7 +24,7 @@ This project extracts and summarizes legal themes from uploaded PDFs using OCR, 
 ## 🧪 Running Locally
 
 1. Clone this repo
-2. Create `.env` file with OpenAI key (optional)
+2. Create `.env` file with GROQ key (optional)
 3. Run backend:
    ```bash
    uvicorn app.main:app --reload
