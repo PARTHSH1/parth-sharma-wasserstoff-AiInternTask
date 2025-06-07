@@ -2,6 +2,31 @@
 
 import streamlit as st
 import requests
+import pandas as pd
+import re
+
+def parse_cited_chunks(chunk_list):
+    rows = []
+    pattern = r"(.+?) \(Page (\d+), Para (\d+)\) — (.+)"
+
+    for chunk in chunk_list:
+        match = re.match(pattern, chunk)
+        if match:
+            doc_id, page, para, summary = match.groups()
+            rows.append({
+                "Doc ID": doc_id.strip(),
+                "Page": int(page),
+                "Paragraph": int(para),
+                "Summary": summary.strip()
+            })
+        else:
+            rows.append({
+                "Doc ID": "Unknown",
+                "Page": "-",
+                "Paragraph": "-",
+                "Summary": chunk
+            })
+    return pd.DataFrame(rows)
 
 API_URL = "http://localhost:8000/api"
 
@@ -44,13 +69,9 @@ if st.button("Get Themes"):
             st.code(data['theme_summary'], language="text")
 
             st.markdown("### 🧾 Raw Answers (Cited Chunks)")
+            df = parse_cited_chunks(data["raw_answers"])
+            st.dataframe(df, use_container_width=True)
 
-            for i, ans in enumerate(data['raw_answers'], 1):
-                st.markdown(f"""
-                <div style='margin-bottom: 1rem; padding: 0.5rem; background-color: #1a1a1a; border-radius: 0.5rem'>
-                    <strong>{i}.</strong> {ans}
-                </div>
-                """, unsafe_allow_html=True)
 
 
         else:
